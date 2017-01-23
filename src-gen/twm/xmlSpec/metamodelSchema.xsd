@@ -1,0 +1,157 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<!-- model -->
+	<xs:element name="model">
+		<xs:complexType>
+			<xs:choice maxOccurs="unbounded">
+				<xs:element ref="concept" />
+				<xs:element ref="association" />
+			</xs:choice>
+			<xs:attribute name="name" type="xs:string" use="required" />
+			<xs:attribute name="version" type="xs:string" />
+			<xs:attribute name="author" type="xs:string" />
+		</xs:complexType>
+	</xs:element>
+	
+	<!-- concept -->
+	<xs:element name="concept">
+		<xs:complexType>
+			<xs:sequence>
+				<!--  Realisation & Subrealisation -->
+				<xs:element name="realisation" minOccurs="0" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="subrealisation" minOccurs="0" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:attribute name="type" use="required">
+										<xs:simpleType>
+  											<xs:restriction base="xs:string">
+   												<xs:minLength value="1"/>
+											</xs:restriction>
+										</xs:simpleType>
+									</xs:attribute>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute name="type" use="required">
+							<xs:simpleType>
+  								<xs:restriction base="xs:string">
+   									<xs:minLength value="1"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:attribute>
+					</xs:complexType>					
+				</xs:element>								
+			</xs:sequence>		
+			<xs:attribute name="name" use="required">
+				<xs:simpleType>
+					<xs:restriction base="xs:ID">
+						<xs:pattern value="[A-Z][a-zA-Z]*"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>		
+			<xs:attribute name="author" type="xs:string" />
+			<xs:attribute name="owner" type="xs:string" />
+		</xs:complexType>
+		<!-- Realisations have to be unique within a concept -->
+		<!--  
+		<xs:key name="RealisationKey">
+		<xs:selector xpath="realisation" /> 
+		<xs:field xpath="@type" />
+		</xs:key>
+		-->
+		<!--  Definition of a key for Realisation and Subrealisation types (union of types) -->
+		<xs:key name="RealSubrealKey">
+		<xs:selector xpath=".//subrealisation|.//realisation" /> 
+		<xs:field xpath="@type" />
+		</xs:key>	
+	</xs:element>
+
+	<!-- association -->
+	<xs:element name="association">
+		<xs:complexType>
+			<xs:sequence>
+				<!-- roles of an association -->			
+				<xs:element name="role" minOccurs="1" maxOccurs="unbounded">
+					<xs:complexType>
+						<!-- subroles of a role-->
+						<xs:sequence>
+							<xs:element name="subrole" minOccurs="0" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:attribute name="name" type="xs:string" use="required" />
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute name="name" type="xs:string" use="required" />
+						<xs:attribute name="card" use="required">
+							<xs:simpleType>
+		  						<xs:restriction base="xs:string">
+			  						<!-- Numbers 1-infinite -->
+			    					<xs:pattern value="[1-9][0-9]*"/>
+			    					<!-- + to represent 1 to * -->
+			    					<xs:pattern value="[+]"/>
+			    					<!-- range for numbers-->
+			    					<xs:pattern value="[1-9][0-9]*[_][1-9][0-9]*"/>
+			    					<!-- range from number to * -->
+			    					<xs:pattern value="[1-9][0-9]*[_][*]"/>
+		  						</xs:restriction>
+							</xs:simpleType>
+						</xs:attribute>
+						<xs:attribute name="subOccurOnce" type="xs:boolean"/>
+					</xs:complexType>
+				</xs:element>				
+				<!-- valid role concept Combination of an association -->
+				<xs:element name="valid-combination" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:sequence>						
+							<xs:element name="role-ref" minOccurs="1" maxOccurs="unbounded"><!-- minOccurs = 1 für den default Fall, dann sollte aber card min 2 sein -->	
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="concept-ref" maxOccurs="unbounded">
+											<xs:complexType>
+												<xs:attribute name="name" type="xs:IDREF" use="required" />
+											</xs:complexType>
+										</xs:element>	
+									</xs:sequence>								
+									<xs:attribute name="name" type="xs:string" use="required" />
+								</xs:complexType>
+								<!-- concept-refs have to be unique within a role-ref -->
+								<xs:key name="ConceptRefkey">
+								<xs:selector xpath="concept-ref" /> 
+								<xs:field xpath="@name" />
+								</xs:key>
+							</xs:element>																		
+						</xs:sequence>					
+					</xs:complexType>
+					<!-- role-refs have to be unique within a valid combination -->
+					<xs:key name="RoleRefkey">
+					<xs:selector xpath="role-ref" /> 
+					<xs:field xpath="@name" />
+					</xs:key>
+				</xs:element>
+			</xs:sequence>
+			<!-- attributes of an association -->
+			<xs:attribute name="name" use="required">
+				<xs:simpleType>
+					<xs:restriction base="xs:ID">
+						<xs:pattern value="[A-Z][a-zA-Z]*"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+		<!-- Definition of a key for role names of an association; name of role-Ref in valid-combination refers to role name -->
+		<xs:key name="RoleKey">
+		<xs:selector xpath="role" /> 
+		<xs:field xpath="@name" />
+		</xs:key>
+		<xs:keyref name="validCombKeyRef" refer="RoleKey">
+		<xs:selector xpath="valid-combination/role-ref" />
+		<xs:field xpath="@name" />
+		</xs:keyref>
+		<!--  Definition of a key for Role and Subrole names (union of role and subrole names) within an association-->
+		<xs:key name="RoleSubroleKey">
+		<xs:selector xpath=".//subrole|.//role" /> 
+		<xs:field xpath="@name" />
+		</xs:key>	
+	</xs:element>
+
+</xs:schema>

@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="twm"
+	version="1.0" author="MANE" xsi:noNamespaceSchemaLocation="metamodelSchema.xsd">
+	<!-- based on paper: Towards Tangible Work Modeling - Stary,Oppl -->
+	<concept name="Process">
+		<realisation type="XAxis"/>
+		<realisation type="YAxis"/>
+		<realisation type="Rotation"/>
+	</concept>
+	
+	<concept name="Role">
+		<realisation type="XAxis"/>
+		<realisation type="YAxis"/>
+		<realisation type="Rotation"/>
+	</concept>
+	
+	<concept name="Data">
+		<realisation type="XAxis"/>
+		<realisation type="YAxis"/>
+		<realisation type="Rotation"/>
+	</concept>
+	
+	<concept name="Goal">
+		<realisation type="XAxis"/>
+		<realisation type="YAxis"/>
+		<realisation type="Rotation"/>
+	</concept>
+
+	<!-- Association Definitions between Basic Building Blocks-->
+	<association name="Strictlybefore">
+		<role name="before" card="1" />
+		<role name="after" card="1" />
+		<valid-combination>
+			<role-ref name="before">
+				<concept-ref name="Process" />
+			</role-ref>
+			<role-ref name="after">
+				<concept-ref name="Process" />
+			</role-ref>
+		</valid-combination>
+	</association>
+	<association name="Creates">
+		<role name="creates" card="1" />
+		<role name="createdBy" card="1" />
+		<valid-combination>
+			<role-ref name="creates">
+				<concept-ref name="Process" />
+			</role-ref>
+			<role-ref name="createdBy">
+				<concept-ref name="Data" />
+			</role-ref>
+		</valid-combination>
+	</association>
+	<association name="IsInputFor">
+		<role name="input" card="1" />
+		<role name="processor" card="1" />
+		<valid-combination>
+			<role-ref name="processor">
+				<concept-ref name="Process" />
+			</role-ref>
+			<role-ref name="input">
+				<concept-ref name="Data" />
+			</role-ref>
+		</valid-combination>
+	</association>
+	<association name="Determines">
+		<role name="determines" card="1" />
+		<role name="determinedBy" card="1" />
+		<valid-combination>
+			<role-ref name="determines">
+				<concept-ref name="Data" />
+			</role-ref>
+			<role-ref name="determinedBy">
+				<concept-ref name="Data" />
+			</role-ref>
+		</valid-combination>
+	</association>
+	<association name="Interdependent">
+		<role name="default" card="2_*" />
+		<valid-combination>
+			<role-ref name="default">
+				<concept-ref name="Data" />
+			</role-ref>
+		</valid-combination>
+	</association>
+	<association name="Has">
+		<role name="parent" card="1" />
+		<role name="child" card="1" />
+		<valid-combination>
+			<role-ref name="parent">
+				<concept-ref name="Process" />
+			</role-ref>
+			<role-ref name="child">
+				<concept-ref name="Goal" />
+			</role-ref>
+		</valid-combination>
+	</association>
+	<association name="Responsible">
+		<role name="responsible" card="1" />
+		<role name="owned" card="1" />
+		<valid-combination>
+			<role-ref name="responsible">
+				<concept-ref name="Role" />
+			</role-ref>
+			<role-ref name="owned">
+				<concept-ref name="Process" />
+			</role-ref>
+		</valid-combination>
+	</association>
+	<association name="InvolesConsults">
+		<role name="involves" card="1" />
+		<role name="consults" card="1" />
+		<valid-combination>
+			<role-ref name="involves">
+				<concept-ref name="Role" />
+			</role-ref>
+			<role-ref name="consults">
+				<concept-ref name="Role" />
+			</role-ref>
+		</valid-combination>
+	</association>
+
+	<!-- Association Definitions between Basic Building Blocks and Artifacts-->
+	
+	<!-- RoleBBB container associations -->
+	<association name="ContainedIn">
+		<role name="container" card="1" />
+		<role name="part" card="+" />
+		<valid-combination>
+			<role-ref name="container">
+				<concept-ref name="Role" />
+			</role-ref>
+			<role-ref name="part">
+				<concept-ref name="Role" />
+			</role-ref>
+		</valid-combination>
+	</association>
+	<association name="AssignmentOfRole">
+		<role name="container" card="1" />
+		<role name="assignedTo" card="+" />
+		<valid-combination>
+			<role-ref name="container">
+				<concept-ref name="Role" />
+			</role-ref>
+			<role-ref name="assignedTo">
+				<concept-ref name="Process" />
+			</role-ref>
+		</valid-combination>
+	</association>
+	<association name="DescriptionOfRole">
+		<role name="container" card="1" />
+		<role name="describes" card="+" />
+		<valid-combination>
+			<role-ref name="container">
+				<concept-ref name="Role" />
+			</role-ref>
+			<role-ref name="describes">
+				<concept-ref name="Data" />
+			</role-ref>
+		</valid-combination>
+	</association>
+	<association name="IntensionsOfRole">
+		<role name="container" card="1" />
+		<role name="part" card="+" />
+		<valid-combination>
+			<role-ref name="container">
+				<concept-ref name="Role" />
+			</role-ref>
+			<role-ref name="part">
+				<concept-ref name="Goal" />
+			</role-ref>
+		</valid-combination>
+	</association>
+
+	<!-- ProcessBBB container associations -->
+	<association name="Supporter">
+		<role name="supportedBy" card="1" />
+		<role name="supports" card="+" />
+		<valid-combination>
+			<role-ref name="supportedBy">
+				<concept-ref name="Process" />
+			</role-ref>
+			<role-ref name="supports">
+				<concept-ref name="Role" />
+			</role-ref>
+		</valid-combination>
+	</association>
+	<association name="Detailing">
+		<role name="ensemble" card="1" />
+		<role name="detail" card="+" />
+		<valid-combination>
+			<role-ref name="ensemble">
+				<concept-ref name="Process" />
+			</role-ref>
+			<role-ref name="detail">
+				<concept-ref name="Process" />
+			</role-ref>
+		</valid-combination>
+	</association>
+	<association name="ProcessInstructions">
+		<role name="process" card="1" />
+		<role name="instruction" card="+" />
+		<valid-combination>
+			<role-ref name="process">
+				<concept-ref name="Process" />
+			</role-ref>
+			<role-ref name="instruction">
+				<concept-ref name="Data" />
+			</role-ref>
+		</valid-combination>
+	</association>
+	<association name="GoalOfProcess">
+		<role name="process" card="1" />
+		<role name="goal" card="+" />
+		<valid-combination>
+			<role-ref name="process">
+				<concept-ref name="Process" />
+			</role-ref>
+			<role-ref name="goal">
+				<concept-ref name="Goal" />
+			</role-ref>
+		</valid-combination>
+	</association>
+
+	<!-- DataBBB container associations -->
+	<association name="OwnerResponsible">
+		<role name="container" card="1" />
+		<role name="responsible" card="+" />
+		<valid-combination>
+			<role-ref name="container">
+				<concept-ref name="Data" />
+			</role-ref>
+			<role-ref name="responsible">
+				<concept-ref name="Role" />
+			</role-ref>
+		</valid-combination>
+	</association>
+	<association name="LifecycleOfData">
+		<role name="container" card="1" />
+		<role name="part" card="+" />
+		<valid-combination>
+			<role-ref name="container">
+				<concept-ref name="Data" />
+			</role-ref>
+			<role-ref name="part">
+				<concept-ref name="Process" />
+			</role-ref>
+		</valid-combination>
+	</association>
+	<association name="ManipulationInstructions">
+		<role name="container" card="1" />
+		<role name="part" card="+" />
+		<valid-combination>
+			<role-ref name="container">
+				<concept-ref name="Data" />
+			</role-ref>
+			<role-ref name="part">
+				<concept-ref name="Data" />
+			</role-ref>
+		</valid-combination>
+	</association>
+	
+</model>
